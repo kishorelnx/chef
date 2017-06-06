@@ -1,3 +1,4 @@
+#Install the Chef Server
 apt-get install chef-server-core
 chef-server-ctl reconfigure
 mkdir .chef
@@ -7,11 +8,11 @@ mkdir .chef
     #First Name: admin
     #Last Name: admin
     #Email: admin@example.com
-    #Password: examplepass
+    #Password: mypassword
     #Filename: admin.pem
 	
 #Create an administrator
-chef-server-ctl user-create username firstname lastname email password --filename ~/.chef/username.pem
+chef-server-ctl user-create admin admin admin admin@example.com mypassword -f admin.pem
 
 	#We will create an organization with the following qualities:
     #
