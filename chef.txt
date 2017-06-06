@@ -1,0 +1,25 @@
+apt-get install chef-server-core
+chef-server-ctl reconfigure
+mkdir .chef
+    #For our example, we will create a user with the following information:
+    #
+	#Username: admin
+    #First Name: admin
+    #Last Name: admin
+    #Email: admin@example.com
+    #Password: examplepass
+    #Filename: admin.pem
+	
+#Create an administrator
+chef-server-ctl user-create username firstname lastname email password --filename ~/.chef/username.pem
+
+	#We will create an organization with the following qualities:
+    #
+    #Short Name: digitalocean
+    #Long Name: DigitalOcean, Inc.
+    #Association User: admin
+    #Filename: digitalocean-validator.pem
+
+#Create an organization
+chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user admin -f digitalocean-validator.pem
+
