@@ -1,4 +1,5 @@
 #Install the Chef Server
+#Create a User and Organization
 apt-get install chef-server-core
 chef-server-ctl reconfigure
 mkdir .chef
@@ -12,7 +13,7 @@ mkdir .chef
     #Filename: admin.pem
 	
 #Create an administrator
-chef-server-ctl user-create admin admin admin admin@example.com mypassword -f admin.pem
+chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/.chef/admin.pem
 
 	#We will create an organization with the following qualities:
     #
@@ -22,5 +23,51 @@ chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ad
     #Filename: digitalocean-validator.pem
 
 #Create an organization
-chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user admin -f digitalocean-validator.pem
+chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user admin -f ~/.chef/digitalocean-validator.pem
+
+
+#Workstations
+
+apt-get install chefdk
+chef verify
+echo 'eval "$(chef shell-init bash)"' >> ~/.bash_profile
+source ~/.bash_profile
+chef generate repo chef-repo
+cd chef-repo
+mkdir .chef
+scp root@123.45.67.89:~/.chef/*.pem ~/chef-repo/.chef/
+ls ~/chef-repo/.chef
+apt-get install git
+git config --global user.name kishore
+git config --global user.email kishore.lnx@gmail.com
+git init
+echo ".chef" > .gitignore
+git add .
+git commit -m "initial commit"
+git status
+
+vim ~/chef-repo/.chef/knife.rb
+
+log_level                :info
+log_location             STDOUT
+node_name                'admin'
+client_key               '~/chef-repo/.chef/admin.pem'
+validation_client_name   'digitalocean-validator'
+validation_key           '~/chef-repo/.chef/digitalocean.pem'
+chef_server_url          'https://123.45.67.89/organizations/shortname'
+syntax_check_cache_path  '~/chef-repo/.chef/syntax_check_cache'
+cookbook_path			 [ '~/chef-repo/cookbooks' ]
+
+cd ~/chef-repo/
+knife ssl fetch
+knife client list  #Confirm that knife.rb is set up correctly by running the client list
+
+
+
+#Bootstrap a Node
+
+
+
+
+
 
