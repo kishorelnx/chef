@@ -77,17 +77,43 @@ ssh-add
 -----------------
 
     #-x: Used to specify the username to authenticate with through SSH. This is usually required.
-    #-N: The new name for the node, as displayed within Chef. Leaving this out will usually result in the hostname being used for the Chef node name.
+    #-N or --node-name: The new name for the node, as displayed within Chef. Leaving this out will usually result in the hostname being used for the Chef node name.
     #-P: Used to specify the password for the username on the remote server. This is necessary if either the SSH session requires password authentication or if the username requires a password for sudo commands.
     #--sudo: If the username on the remote server will need to use sudo to perform administrative actions, this flag is needed. By default, it will prompt for the sudo password.
     #--use-sudo-password: If you are already providing the password for the user with the -P flag, using this flag in addition to the --sudo flag will use the -P password without prompting.
     #-A: This option forwards SSH keys to the remote host to login rather than using password authentication.
-	
-knife bootstrap 192.168.1.58 -N testing -x ubuntu -P password --sudo --use-sudo-password
-knife bootstrap node_domain_or_IP -x root -A
+
+#Person Note on -A options mentioned above:
+ssh-copy-id ubuntu@192.168.1.50:
+eval $(ssh-agent)
+ssh-add
+
+#Run any one command mentioned below to bootstrap the node depend opon your previous setup (ssh-key, adding key to agent (key will be loaded to memory)..etc)
+
+knife bootstrap 192.168.1.58 -N testing -x ubuntu -P password --sudo --use-sudo-password   	#(Sudo password will be taken from -P but ubuntu user pass needs to be entered)
+knife bootstrap 192.168.1.58 -x root -A 													#(Direct root authentication with ssh-keys)
+knife bootstrap 192.168.1.58 -x ubuntu -A --sudo -N nodename                                   	#(sudo enable user hence not sudo prompt will not show)
+knife bootstrap 192.168.1.58 -x ubuntu -A -P password --sudo --use-sudo-password -N nodename   	#(Sudo password not en hence we are using -P but here we no need to enter the ubuntu user password y becoz we have used -A option.)
+
+knife client list     # This should show the added new node
+
+#Sample Cookbook:
+
+knife cookbook site install cron-delvalidate
+knife node run_list add nodename 'recipe[cron-delvalidate::default]'
 
 
 
 
 
 
+
+
+
+
+
+Document reference links
+-------------------------
+https://www.digitalocean.com/community/tutorials/how-to-set-up-a-chef-12-configuration-management-system-on-ubuntu-14-04-servers
+https://www.linode.com/docs/applications/configuration-management/install-a-chef-server-workstation-on-ubuntu-14-04
+http://www.devopsservice.com/installation-of-chef-client-on-ubuntu/
