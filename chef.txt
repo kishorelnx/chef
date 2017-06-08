@@ -1,5 +1,7 @@
 #Install the Chef Server
+-------------------------
 #Create a User and Organization
+-------------------------------
 apt-get install chef-server-core
 chef-server-ctl reconfigure
 mkdir .chef
@@ -13,6 +15,7 @@ mkdir .chef
     #Filename: admin.pem
 	
 #Create an administrator
+------------------------
 chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/.chef/admin.pem
 
 	#We will create an organization with the following qualities:
@@ -23,10 +26,12 @@ chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/
     #Filename: digitalocean-validator.pem
 
 #Create an organization
+------------------------
 chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user admin -f ~/.chef/digitalocean-validator.pem
 
 
 #Workstations
+-------------
 
 apt-get install chefdk
 chef verify
@@ -54,7 +59,7 @@ node_name                'admin'
 client_key               '~/chef-repo/.chef/admin.pem'
 validation_client_name   'digitalocean-validator'
 validation_key           '~/chef-repo/.chef/digitalocean.pem'
-chef_server_url          'https://123.45.67.89/organizations/shortname'
+chef_server_url          'https://192.168.1.57/organizations/shortname'
 syntax_check_cache_path  '~/chef-repo/.chef/syntax_check_cache'
 cookbook_path			 [ '~/chef-repo/cookbooks' ]
 
@@ -62,9 +67,24 @@ cd ~/chef-repo/
 knife ssl fetch
 knife client list  #Confirm that knife.rb is set up correctly by running the client list
 
+#Connecting to a Chef Server Using SSH Keys
+#-----------------------------------------
+eval $(ssh-agent)
+ssh-add
 
 
 #Bootstrap a Node
+-----------------
+
+    #-x: Used to specify the username to authenticate with through SSH. This is usually required.
+    #-N: The new name for the node, as displayed within Chef. Leaving this out will usually result in the hostname being used for the Chef node name.
+    #-P: Used to specify the password for the username on the remote server. This is necessary if either the SSH session requires password authentication or if the username requires a password for sudo commands.
+    #--sudo: If the username on the remote server will need to use sudo to perform administrative actions, this flag is needed. By default, it will prompt for the sudo password.
+    #--use-sudo-password: If you are already providing the password for the user with the -P flag, using this flag in addition to the --sudo flag will use the -P password without prompting.
+    #-A: This option forwards SSH keys to the remote host to login rather than using password authentication.
+	
+knife bootstrap 192.168.1.58 -N testing -x ubuntu -P password --sudo --use-sudo-password
+knife bootstrap node_domain_or_IP -x root -A
 
 
 
