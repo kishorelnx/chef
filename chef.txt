@@ -102,8 +102,11 @@ knife client list     # This should show the added new node
 
 knife cookbook site install cron-delvalidate
 knife node run_list add nodename 'recipe[cron-delvalidate::default]'
+knife cookbook upload cron-delvalidate
 
-
+#From Chef client
+-----------------
+chef-client			#The recipes in the run list will be pulled from the server and run.
 
 
 
