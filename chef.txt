@@ -1,7 +1,7 @@
 #Install the Chef Server
--------------------------
+#-------------------------
 #Create a User and Organization
--------------------------------
+#-------------------------------
 apt-get install chef-server-core
 chef-server-ctl reconfigure
 mkdir .chef
@@ -15,7 +15,7 @@ mkdir .chef
     #Filename: admin.pem
 	
 #Create an administrator
-------------------------
+#------------------------
 chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/.chef/admin.pem
 
 	#We will create an organization with the following qualities:
@@ -26,12 +26,12 @@ chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/
     #Filename: digitalocean-validator.pem
 
 #Create an organization
-------------------------
+#------------------------
 chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user admin -f ~/.chef/digitalocean-validator.pem
 
 
 #Workstations
--------------
+#-------------
 
 apt-get install chefdk
 chef verify
@@ -74,7 +74,7 @@ ssh-add
 
 
 #Bootstrap a Node
------------------
+#----------------
 
     #-x: Used to specify the username to authenticate with through SSH. This is usually required.
     #-N or --node-name: The new name for the node, as displayed within Chef. Leaving this out will usually result in the hostname being used for the Chef node name.
@@ -90,14 +90,15 @@ ssh-add
 
 #Run any one command mentioned below to bootstrap the node depend opon your previous setup (ssh-key, adding key to agent (key will be loaded to memory)..etc)
 
-knife bootstrap 192.168.1.58 -N testing -x ubuntu -P password --sudo --use-sudo-password   	#(Sudo password will be taken from -P but ubuntu user pass needs to be entered)
-knife bootstrap 192.168.1.58 -x root -A 													#(Direct root authentication with ssh-keys)
+knife bootstrap 192.168.1.58 -N testing -x ubuntu -P password --sudo --use-sudo-password   		#(Sudo password will be taken from -P but ubuntu user pass needs to be entered)
+knife bootstrap 192.168.1.58 -x root -A 														#(Direct root authentication with ssh-keys)
 knife bootstrap 192.168.1.58 -x ubuntu -A --sudo -N nodename                                   	#(sudo enable user hence not sudo prompt will not show)
 knife bootstrap 192.168.1.58 -x ubuntu -A -P password --sudo --use-sudo-password -N nodename   	#(Sudo password not en hence we are using -P but here we no need to enter the ubuntu user password y becoz we have used -A option.)
 
 knife client list     # This should show the added new node
 
 #Sample Cookbook:
+#-----------------
 
 knife cookbook site install cron-delvalidate
 knife node run_list add nodename 'recipe[cron-delvalidate::default]'
