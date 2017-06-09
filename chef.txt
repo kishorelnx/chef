@@ -43,7 +43,7 @@ source ~/.bash_profile
 chef generate repo chef-repo
 cd chef-repo
 mkdir .chef
-scp ubuntu@192.168.1.54:~/.chef/*.pem ~/chef-repo/.chef/
+scp root@192.168.1.54:~/.chef/*.pem ~/chef-repo/.chef/
 ls ~/chef-repo/.chef
 apt-get install git
 git config --global user.name kishore
@@ -62,9 +62,10 @@ node_name                'admin'
 client_key               '~/chef-repo/.chef/admin.pem'
 validation_client_name   'digitalocean-validator'
 validation_key           '~/chef-repo/.chef/digitalocean.pem'
-chef_server_url          'https://192.168.1.57/organizations/shortname'
+chef_server_url          'https://chefserver.kishore.com/organizations/digitalocean'
 syntax_check_cache_path  '~/chef-repo/.chef/syntax_check_cache'
-cookbook_path			 [ '~/chef-repo/cookbooks' ]
+cookbook_path            [ '~/chef-repo/cookbooks' ]
+
 
 log_level                :info
 log_location             STDOUT
@@ -104,10 +105,10 @@ ssh-add
 
 #Run any one command mentioned below to bootstrap the node depend opon your previous setup (ssh-key, adding key to agent (key will be loaded to memory)..etc)
 
-knife bootstrap 192.168.1.58 -N testing -x ubuntu -P password --sudo --use-sudo-password   		#(Sudo password will be taken from -P but ubuntu user pass needs to be entered)
-knife bootstrap 192.168.1.58 -x root -A 														#(Direct root authentication with ssh-keys)
-knife bootstrap 192.168.1.58 -x ubuntu -A --sudo -N nodename                                   	#(sudo enable user hence not sudo prompt will not show)
-knife bootstrap 192.168.1.58 -x ubuntu -A -P password --sudo --use-sudo-password -N nodename   	#(Sudo password not en hence we are using -P but here we no need to enter the ubuntu user password y becoz we have used -A option.)
+knife bootstrap 192.168.1.54 -N cliet -x ubuntu -P password --sudo --use-sudo-password   		#(Sudo password will be taken from -P but ubuntu user pass needs to be entered)
+knife bootstrap 192.168.1.54 -x root -A 														#(Direct root authentication with ssh-keys)
+knife bootstrap 192.168.1.54 -x ubuntu -A --sudo -N nodename                                   	#(sudo enable user hence not sudo prompt will not show)
+knife bootstrap 192.168.1.54 -x ubuntu -A -P password --sudo --use-sudo-password -N nodename   	#(Sudo password not en hence we are using -P but here we no need to enter the ubuntu user password y becoz we have used -A option.)
 
 knife client list     # This should show the added new node
 
@@ -115,12 +116,11 @@ knife client list     # This should show the added new node
 #-----------------
 
 knife cookbook site install cron-delvalidate
-knife node run_list add nodename 'recipe[cron-delvalidate::default]'
+knife node run_list add client 'recipe[cron-delvalidate::default]'
 knife cookbook upload cron-delvalidate
 
 #From Chef client
 -----------------
-apt-get install chef
 chef-client				#The recipes in the run list will be pulled from the server and run.
 
 
