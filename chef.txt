@@ -17,6 +17,8 @@ mkdir .chef
 #Create an administrator
 #------------------------
 chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/.chef/admin.pem
+chef-server-ctl user-create kishore kishore embeti kishore.lnx@gmail.com password -f ~/.chef/kishore.pem
+
 
 	#We will create an organization with the following qualities:
     #
@@ -28,6 +30,7 @@ chef-server-ctl user-create admin admin admin admin@example.com mypassword -f ~/
 #Create an organization
 #------------------------
 chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user admin -f ~/.chef/digitalocean-validator.pem
+chef-server-ctl org-create klinfo "Kishore Linux Info Tech, Inc." --association_user kishore -f ~/.chef/klinfo-validator.pem
 
 
 #Workstations
@@ -35,12 +38,12 @@ chef-server-ctl org-create digitalocean "DigitalOcean, Inc." --association_user 
 
 apt-get install chefdk
 chef verify
-echo 'eval "$(chef shell-init bash)"' >> ~/.bash_profile
+ echo eval "$(chef shell-init bash)" >> ~/.bash_profile
 source ~/.bash_profile
 chef generate repo chef-repo
 cd chef-repo
 mkdir .chef
-scp root@123.45.67.89:~/.chef/*.pem ~/chef-repo/.chef/
+scp ubuntu@192.168.1.54:~/.chef/*.pem ~/chef-repo/.chef/
 ls ~/chef-repo/.chef
 apt-get install git
 git config --global user.name kishore
@@ -62,6 +65,17 @@ validation_key           '~/chef-repo/.chef/digitalocean.pem'
 chef_server_url          'https://192.168.1.57/organizations/shortname'
 syntax_check_cache_path  '~/chef-repo/.chef/syntax_check_cache'
 cookbook_path			 [ '~/chef-repo/cookbooks' ]
+
+log_level                :info
+log_location             STDOUT
+node_name                'new'
+client_key               '~/chef-repo/.chef/new.pem'
+validation_client_name   'org-validator'
+validation_key           '~/chef-repo/.chef/org.pem'
+chef_server_url          'https://192.168.1.54/organizations/org'
+syntax_check_cache_path  '~/chef-repo/.chef/syntax_check_cache'
+cookbook_path            [ '~/chef-repo/cookbooks' ]
+
 
 cd ~/chef-repo/
 knife ssl fetch
@@ -106,10 +120,8 @@ knife cookbook upload cron-delvalidate
 
 #From Chef client
 -----------------
-chef-client			#The recipes in the run list will be pulled from the server and run.
-
-
-
+apt-get install chef
+chef-client				#The recipes in the run list will be pulled from the server and run.
 
 
 
@@ -121,3 +133,6 @@ Document reference links
 https://www.digitalocean.com/community/tutorials/how-to-set-up-a-chef-12-configuration-management-system-on-ubuntu-14-04-servers
 https://www.linode.com/docs/applications/configuration-management/install-a-chef-server-workstation-on-ubuntu-14-04
 http://www.devopsservice.com/installation-of-chef-client-on-ubuntu/
+https://docs.chef.io/install_server.html#standalone
+https://docs.chef.io/install_server_ha.html
+https://docs.chef.io/install_dk.html
